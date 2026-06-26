@@ -85,7 +85,7 @@ photos.map(photo=>(
 
 <div
 
-key={photo.public_id}
+key={photo.id}
 
 className="bg-white rounded-xl shadow p-4"
 
