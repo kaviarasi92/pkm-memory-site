@@ -1,27 +1,31 @@
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
-import cloudinary from "@/lib/cloudinary";
+import { db } from "@/lib/firebase";
+
+import { collection, getDocs } from "firebase/firestore";
 
 
 export async function GET(){
 
 
-const result =
-await cloudinary.search
-.expression(
-"folder:PKM-Memories"
-)
-.sort_by(
-"created_at",
-"desc"
-)
-.max_results(100)
-.execute();
+const snapshot = await getDocs(
+
+collection(db,"photos")
+
+);
 
 
 
-return NextResponse.json(result.resources);
+const photos = snapshot.docs.map(doc=>({
 
+id:doc.id,
+
+...doc.data()
+
+}));
+
+
+return NextResponse.json(photos);
 
 
 }
