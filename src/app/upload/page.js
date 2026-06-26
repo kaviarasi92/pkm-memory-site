@@ -1,115 +1,135 @@
 "use client";
 
-
-import {useState} from "react";
-
-import {useSearchParams} from "next/navigation";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 
+function UploadForm() {
 
-export default function Upload(){
+  const params = useSearchParams();
 
-
-const params=useSearchParams();
-
-
-const album=params.get("album");
-
-const [file,setFile]=useState(null);
+  const album = params.get("album") || "family";
 
 
-
-const upload=async()=>{
-
-
-const formData=new FormData();
+  const [file, setFile] = useState(null);
 
 
-formData.append(
-"file",
-file
-);
+  const upload = async () => {
+
+    if (!file) {
+      alert("Please select a photo first");
+      return;
+    }
 
 
-formData.append(
-"folder",
-album
-);
+    const formData = new FormData();
+
+
+    formData.append(
+      "file",
+      file
+    );
+
+
+    formData.append(
+      "folder",
+      album
+    );
+
+
+    const res = await fetch(
+      "/api/upload",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+
+    const data = await res.json();
+
+
+    console.log(data);
+
+
+    alert("Photo uploaded ❤️");
+
+
+  };
+
+
+  return (
+
+    <div className="min-h-screen flex flex-col items-center justify-center">
+
+
+      <h1 className="text-3xl font-bold">
+
+        Upload to {album}
+
+      </h1>
 
 
 
-const res=await fetch(
+      <input
 
-"/api/upload",
+        type="file"
 
-{
+        accept="image/*"
 
-method:"POST",
+        onChange={(e)=>setFile(e.target.files[0])}
 
-body:formData
+        className="mt-5"
+
+      />
+
+
+
+      <button
+
+        className="bg-blue-600 text-white p-3 mt-5 rounded"
+
+        onClick={upload}
+
+      >
+
+        Upload
+
+      </button>
+
+
+
+    </div>
+
+  );
 
 }
 
-);
 
 
-
-const data=await res.json();
-
-
-console.log(data);
+export default function Upload() {
 
 
+  return (
 
-alert("Photo uploaded ❤️");
+    <Suspense
 
+      fallback={
 
+        <div className="min-h-screen flex items-center justify-center">
 
-};
+          Loading...
 
+        </div>
 
+      }
 
-return(
+    >
 
+      <UploadForm />
 
-<div className="min-h-screen flex flex-col items-center justify-center">
+    </Suspense>
 
-
-<h1 className="text-3xl font-bold">
-
-Upload to {album}
-
-</h1>
-
-
-
-<input
-
-type="file"
-
-onChange={(e)=>setFile(e.target.files[0])}
-
-/>
-
-
-
-<button
-
-className="bg-blue-600 text-white p-3 mt-5"
-
-onClick={upload}
-
->
-
-Upload
-
-</button>
-
-
-
-</div>
-
-
-)
+  );
 
 }
